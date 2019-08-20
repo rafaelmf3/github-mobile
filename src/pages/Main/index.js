@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {Keyboard, ActivityIndicator} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {Keyboard, ActivityIndicator, AsyncStorage} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import api from '../../services/api';
 
@@ -22,6 +22,14 @@ export default function Main() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    AsyncStorage.getItem('@users').then((users) => setUsers(users));
+  }, []);
+
+  useEffect(()=>{
+    AsyncStorage.setItem('@users', JSON.stringify(users));
+  }, [users]);
+
   handleSubmit = async () => {
     setLoading(true);
 
@@ -34,7 +42,15 @@ export default function Main() {
       avatar: response.data.avatar_url,
     }
 
-    setUsers([...users, data]);
+    const exist = users.findIndex(user => user.name === data.name);
+
+    if ((exist)) {
+      // console.tron.log(users);
+      // console.tron.log(exist);
+      // console.tron.log(data);
+      setUsers([...users, data]);
+    }
+
     setLoading(false);
 
     Keyboard.dismiss();
