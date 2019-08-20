@@ -57,7 +57,7 @@ export default function Main() {
       </Form>
       <List
         data={users}
-        keyExtrator={user => user.login}
+        keyExtractor={user => user.login}
         renderItem={({item}) => (
           <User>
             <Avatar source={{ uri: item.avatar}} />
