@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {Keyboard} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {Keyboard, AsyncStorage} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import api from '../../services/api';
 
@@ -14,12 +14,31 @@ import {
   Name,
   Bio,
   ProfileButton,
-  ProfileButtonText
+  ProfileButtonText,
+  RemoveButton
 } from './styles';
 
 export default function Main() {
   const [user, setUser ] = useState("");
   const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    async function loadUsers(){
+      const users = await AsyncStorage.getItem('users');
+      setUsers(users);
+    }
+    loadUsers();
+  }, []);
+
+  useEffect(() => {
+    async function updateUsers(){
+      const prevState = await AsyncStorage.getItem('users');
+      if (prevState !== users) {
+        AsyncStorage.setItem("users", JSON.stringify(users));
+      }
+    }
+    updateUsers();
+  }, [users]);
 
   handleSubmit = async () => {
     const response = await api.get(`users/${user}`);
@@ -33,10 +52,20 @@ export default function Main() {
 
     setUsers([...users, data]);
 
-    console.tron.log({users});
-
     Keyboard.dismiss();
   };
+
+  handleRemove = async () => {
+    // const response = await api.get(`users/${user}`);
+    // console.tron.log('Apertei o botão');
+    try {
+      await AsyncStorage.clear();
+      return true;
+    } catch(err) {
+      console.tron.log(err);
+      return false;
+    }
+  }
 
   return (
     <Container>
@@ -54,15 +83,18 @@ export default function Main() {
       </Form>
       <List
         data={users}
-        keyExtrator={user => user.login}
+        keyExtractor={user => user.login}
         renderItem={({item}) => (
           <User>
             <Avatar source={{ uri: item.avatar}} />
             <Name>{item.name}</Name>
             <Bio>{item.bio}</Bio>
-            <ProfileButton onPress={ () => {}}>
+            <ProfileButton onPress={() => {}}>
               <ProfileButtonText>Ver perfil</ProfileButtonText>
             </ProfileButton>
+            <RemoveButton onPress={handleRemove}>
+              <Icon name="clear" size={20} color="#fff"/>
+            </RemoveButton>
           </User>
         )}
       />
