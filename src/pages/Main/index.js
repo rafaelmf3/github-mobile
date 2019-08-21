@@ -32,33 +32,41 @@ export default function Main() {
   }, []);
 
   useEffect(()=>{
-    //AsyncStorage.setItem('@users', JSON.stringify(users));
+    AsyncStorage.setItem('@users', JSON.stringify(users));
+
     console.tron.log(users);
-    console.tron.log("useEffect quando muda users");
+
 
   }, [users]);
 
   handleSubmit = async () => {
     setLoading(true);
 
-    const response = await api.get(`users/${user}`);
+    api.get(`users/${user}`, {
+      timeout: 1000
+    }).then((response) => {
+      const data ={
+        name: response.data.name,
+        login: response.data.login,
+        bio: response.data.bio,
+        avatar: response.data.avatar_url,
+      }
 
-    const data ={
-      name: response.data.name,
-      login: response.data.login,
-      bio: response.data.bio,
-      avatar: response.data.avatar_url,
-    }
+      const exist = users.findIndex(user => user.name === data.name);
+      console.tron.log(exist);
+      if (exist === -1) {
+        setUsers([...users, data]);
+      }
 
-    const exist = users.findIndex(user => user.name === data.name);
-    console.tron.log(exist);
-    if (exist === -1) {
-      setUsers([...users, data]);
-    }
+      setLoading(false);
+      setUser("");
+      Keyboard.dismiss();
+    }).catch( function (err){
+      setLoading(false);
+      return console.tron.log(err.message);
+    });
 
-    setLoading(false);
 
-    Keyboard.dismiss();
   };
 
   return (
