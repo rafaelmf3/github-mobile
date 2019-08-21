@@ -65,8 +65,8 @@ export default function Main(props) {
 
   };
 
-  handleNavigate = () => {
-    props.navigation.navigate('User');
+  handleNavigate = (user) => {
+    props.navigation.navigate('User', {user});
   }
 
   return (
@@ -90,10 +90,10 @@ export default function Main(props) {
         renderItem={({item}) => (
           <User>
             <Avatar source={{ uri: item.avatar}} />
-            <Name>{item.name}</Name>
+            <Name>{item.login} - {item.name}</Name>
             <Followers>{item.followers} Seguidores</Followers>
             <Bio>{item.bio}</Bio>
-            <ProfileButton onPress={handleNavigate}>
+            <ProfileButton onPress={() => handleNavigate(item)}>
               <ProfileButtonText>Ver perfil</ProfileButtonText>
             </ProfileButton>
           </User>
