@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {Keyboard, ActivityIndicator} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {Keyboard, ActivityIndicator, AsyncStorage} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import api from '../../services/api';
 
@@ -22,22 +22,51 @@ export default function Main() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    AsyncStorage.getItem('@users').then((users) => {
+      if (users === "null") {
+        setUsers(users)
+      }
+    });
+    console.tron.log("useEffect inicial");
+  }, []);
+
+  useEffect(()=>{
+    AsyncStorage.setItem('@users', JSON.stringify(users));
+
+    console.tron.log(users);
+
+
+  }, [users]);
+
   handleSubmit = async () => {
     setLoading(true);
 
-    const response = await api.get(`users/${user}`);
+    api.get(`users/${user}`, {
+      timeout: 1000
+    }).then((response) => {
+      const data ={
+        name: response.data.name,
+        login: response.data.login,
+        bio: response.data.bio,
+        avatar: response.data.avatar_url,
+      }
 
-    const data ={
-      name: response.data.name,
-      login: response.data.login,
-      bio: response.data.bio,
-      avatar: response.data.avatar_url,
-    }
+      const exist = users.findIndex(user => user.name === data.name);
+      console.tron.log(exist);
+      if (exist === -1) {
+        setUsers([...users, data]);
+      }
 
-    setUsers([...users, data]);
-    setLoading(false);
+      setLoading(false);
+      setUser("");
+      Keyboard.dismiss();
+    }).catch( function (err){
+      setLoading(false);
+      return console.tron.log(err.message);
+    });
 
-    Keyboard.dismiss();
+
   };
 
   return (
