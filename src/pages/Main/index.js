@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {Keyboard, ActivityIndicator, AsyncStorage} from 'react-native';
+import {Keyboard, ActivityIndicator, AsyncStorage, } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import api from '../../services/api';
 
@@ -14,10 +14,11 @@ import {
   Name,
   Bio,
   ProfileButton,
-  ProfileButtonText
+  ProfileButtonText,
+  Followers
 } from './styles';
 
-export default function Main() {
+export default function Main(props) {
   const [user, setUser ] = useState("");
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -28,15 +29,10 @@ export default function Main() {
         setUsers(users)
       }
     });
-    console.tron.log("useEffect inicial");
   }, []);
 
   useEffect(()=>{
     AsyncStorage.setItem('@users', JSON.stringify(users));
-
-    console.tron.log(users);
-
-
   }, [users]);
 
   handleSubmit = async () => {
@@ -50,10 +46,10 @@ export default function Main() {
         login: response.data.login,
         bio: response.data.bio,
         avatar: response.data.avatar_url,
+        followers: response.data.followers,
       }
 
       const exist = users.findIndex(user => user.name === data.name);
-      console.tron.log(exist);
       if (exist === -1) {
         setUsers([...users, data]);
       }
@@ -68,6 +64,10 @@ export default function Main() {
 
 
   };
+
+  handleNavigate = () => {
+    props.navigation.navigate('User');
+  }
 
   return (
     <Container>
@@ -91,8 +91,9 @@ export default function Main() {
           <User>
             <Avatar source={{ uri: item.avatar}} />
             <Name>{item.name}</Name>
+            <Followers>{item.followers} Seguidores</Followers>
             <Bio>{item.bio}</Bio>
-            <ProfileButton onPress={ () => {}}>
+            <ProfileButton onPress={handleNavigate}>
               <ProfileButtonText>Ver perfil</ProfileButtonText>
             </ProfileButton>
           </User>

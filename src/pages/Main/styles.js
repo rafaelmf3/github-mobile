@@ -33,8 +33,6 @@ export const SubmitButton = styled(RectButton)`
   opacity: ${props => (props.loading ? 0.7 : 1)}
 `;
 
-export const TitleForm = styled.View``;
-
 export const Image = styled.Image`
   height: 300px;
   margin-top: 20px;
@@ -66,6 +64,14 @@ export const Avatar = styled.Image`
   height: 64px;
   border-radius: 32px;
   background: #eee;
+`;
+
+export const Followers = styled.Text`
+  font-size: 10px;
+  color: #333;
+  font-weight: bold;
+  margin-top: 4px;
+  text-align: center;
 `;
 
 export const Name = styled.Text`
