@@ -23,11 +23,19 @@ export default function Main() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    AsyncStorage.getItem('@users').then((users) => setUsers(users));
+    AsyncStorage.getItem('@users').then((users) => {
+      if (users === "null") {
+        setUsers(users)
+      }
+    });
+    console.tron.log("useEffect inicial");
   }, []);
 
   useEffect(()=>{
-    AsyncStorage.setItem('@users', JSON.stringify(users));
+    //AsyncStorage.setItem('@users', JSON.stringify(users));
+    console.tron.log(users);
+    console.tron.log("useEffect quando muda users");
+
   }, [users]);
 
   handleSubmit = async () => {
@@ -43,11 +51,8 @@ export default function Main() {
     }
 
     const exist = users.findIndex(user => user.name === data.name);
-
-    if ((exist)) {
-      // console.tron.log(users);
-      // console.tron.log(exist);
-      // console.tron.log(data);
+    console.tron.log(exist);
+    if (exist === -1) {
       setUsers([...users, data]);
     }
 
