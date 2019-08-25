@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react';
-import {Keyboard, ActivityIndicator, AsyncStorage, } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Keyboard, ActivityIndicator, AsyncStorage } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import api from '../../services/api';
 
@@ -15,59 +15,60 @@ import {
   Bio,
   ProfileButton,
   ProfileButtonText,
-  Followers
+  Followers,
 } from './styles';
 
 export default function Main(props) {
-  const [user, setUser ] = useState("");
+  const [user, setUser] = useState('');
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    AsyncStorage.getItem('@users').then((users) => {
-      if (users === "null") {
-        setUsers(users)
+    AsyncStorage.getItem('@users').then(users => {
+      if (users === 'null') {
+        setUsers(users);
       }
     });
   }, []);
 
-  useEffect(()=>{
+  useEffect(() => {
     AsyncStorage.setItem('@users', JSON.stringify(users));
   }, [users]);
 
   handleSubmit = async () => {
     setLoading(true);
 
-    api.get(`users/${user}`, {
-      timeout: 1000
-    }).then((response) => {
-      const data ={
-        name: response.data.name,
-        login: response.data.login,
-        bio: response.data.bio,
-        avatar: response.data.avatar_url,
-        followers: response.data.followers,
-      }
+    api
+      .get(`users/${user}`, {
+        timeout: 1000,
+      })
+      .then(response => {
+        const data = {
+          name: response.data.name,
+          login: response.data.login,
+          bio: response.data.bio,
+          avatar: response.data.avatar_url,
+          followers: response.data.followers,
+        };
 
-      const exist = users.findIndex(user => user.name === data.name);
-      if (exist === -1) {
-        setUsers([...users, data]);
-      }
+        const exist = users.findIndex(user => user.name === data.name);
+        if (exist === -1) {
+          setUsers([...users, data]);
+        }
 
-      setLoading(false);
-      setUser("");
-      Keyboard.dismiss();
-    }).catch( function (err){
-      setLoading(false);
-      return console.tron.log(err.message);
-    });
-
-
+        setLoading(false);
+        setUser('');
+        Keyboard.dismiss();
+      })
+      .catch(function(err) {
+        setLoading(false);
+        return console.tron.log(err.message);
+      });
   };
 
-  handleNavigate = (user) => {
-    props.navigation.navigate('User', {user});
-  }
+  handleNavigate = user => {
+    props.navigation.navigate('User', { user });
+  };
 
   return (
     <Container>
@@ -80,17 +81,22 @@ export default function Main(props) {
           onChangeText={text => setUser(text)}
         />
         <SubmitButton loading={loading} onPress={handleSubmit}>
-          { loading ? <ActivityIndicator color="#fff" />: <Icon name="add" size={20} color="#fff"/>}
-
+          {loading ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Icon name="add" size={20} color="#fff" />
+          )}
         </SubmitButton>
       </Form>
       <List
         data={users}
         keyExtractor={user => user.login}
-        renderItem={({item}) => (
+        renderItem={({ item }) => (
           <User>
-            <Avatar source={{ uri: item.avatar}} />
-            <Name>{item.login} - {item.name}</Name>
+            <Avatar source={{ uri: item.avatar }} />
+            <Name>
+              {item.login} - {item.name}
+            </Name>
             <Followers>{item.followers} Seguidores</Followers>
             <Bio>{item.bio}</Bio>
             <ProfileButton onPress={() => handleNavigate(item)}>
@@ -105,4 +111,4 @@ export default function Main(props) {
 
 Main.navigationOptions = {
   title: 'Usuários',
-}
+};
